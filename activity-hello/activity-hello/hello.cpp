@@ -1,11 +1,13 @@
+#include<stdio.h>
+#include<unistd.h>
+
 int main () {
 
-	int myHostName;
-	char myHostSize[100];
+	char myHostName[100];
 
-	myHostName =  gethostname(myHostSize , sizeof(myHostSize));
+	gethostname(myHostName , sizeof(myHostName));
 
-	printf("Hostname = %d\t\n",myHostName);
+	printf("Hostname = %s\t\n",myHostName);
 
 	return 0;
 }
