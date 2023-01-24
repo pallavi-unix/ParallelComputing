@@ -3,7 +3,7 @@
 
 int main () {
 	char myHostName[100];
-	gethostname(myHostName, size(myHostName));
+	gethostname(myHostName, sizeof(myHostName));
 	printf("Hostname = %s\t\n", myHostName);
 	
 	return 0;
