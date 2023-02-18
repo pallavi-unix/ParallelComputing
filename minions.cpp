@@ -6,38 +6,38 @@
 
 using namespace std;
 
-void minion();
+void minion(int);
 void overlord();
 
 int main (int argc, char** argv) {
   if (argc < 2) {
-    std::cerr<<"usage: "<<argv[0]<<" <nbminions>\n";
+    cerr<<"usage: "<<argv[0]<<" <nbminions>\n";
     return -1;
   }
   //Your code goes here
   
-  int cnt = std::stoi(argv[1]);
+  int cnt = stoi(argv[1]);
 
   for(int i =0; i < cnt; i++)
   {
-    std::thread t1 (minion);
+    thread t1 (minion, (i+1));
     t1.join();
   }  
 
-  std::thread myThread2 (overlord);
+  thread t2 (overlord);
   
-  myThread2.join();
+  t2.join();
 
   return 0;
 }
 
-void minion()
+void minion(int cnt)
 {
-	std::cout<<"Hello! I am minion ";
+	cout<<"Hello! I am minion "<<cnt;
 }
 
 void overlord()
 {
-	std::cout<<"Hello Minions! I am the Overlord ";
+	cout<<"Hello Minions! I am the Overlord ";
 }
 
