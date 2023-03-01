@@ -1,4 +1,4 @@
-SRCS =  main.cpp Dictionary.cpp  MyHashtable.cpp 
+SRCS =  main.cpp Dictionary.hpp  MyHashtable.hpp 
 
 
 # Everything below that should not have to change ever.

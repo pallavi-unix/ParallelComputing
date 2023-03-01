@@ -2,9 +2,13 @@
 #include <fstream>
 #include <sstream>
 #include <vector>
+#include <thread>
+#include <mutex>
 
-#include "Dictionary.cpp"
-#include "MyHashtable.cpp"
+#include "Dictionary.hpp"
+#include "MyHashtable.hpp"
+
+using namespace std;
 
 //Tokenize a string into individual word, removing punctuation at the
 //end of words
@@ -45,7 +49,7 @@ std::vector<std::vector<std::string>> tokenizeLyrics(const std::vector<std::stri
   return ret;
 }
 
-
+void wordFine(MyHashtable<string,int> &dict, vector<string> filecontent,mutex& mut);
 
 int main(int argc, char **argv)
 {
@@ -73,29 +77,49 @@ int main(int argc, char **argv)
   MyHashtable<std::string, int> ht;
   Dictionary<std::string, int>& dict = ht;
 
-
-
   // write code here
 
+  vector<thread> myThreads;
+  mutex mu;
+
+  // Start Timer
+  auto start_time = chrono::steady_clock::now();
+
+  for(auto &filecontent:wordmap)
+  {
+      myThreads.push_back(thread(wordFine, ref(ht), ref(filecontent), ref(mu)));
+  }
+
+  for(auto &aa : myThreads)
+  {
+     aa.join();
+  }
+
+  //Stop timer
+  auto stop_time = chrono::steady_clock::now();
+  chrono::duration<double> time_elapsed = stop_time-start_time;
 
 
-
-
-
-
-
-
-  /*
   // Check Hash Table Values 
   // (you can uncomment, but this must be commented out for tests)
   for (auto it : dict) {
     if (it.second > thresholdCount)
       std::cout << it.first << " " << it.second << std::endl;
   }
-  */
 
   // Do not touch this, need for test cases
   std::cout << ht.get(testWord) << std::endl;
-
+  cerr<<time_elapsed.count()<<"\n";
   return 0;
 }
+
+void wordFine(MyHashtable<string,int> &dictionary, vector<string> filecont, mutex& mut)
+{
+  for(int i=0;i<filecont.size();i++)
+    {
+      mut.lock();
+      dictionary.increase(filecont[i]);
+      mut.unlock();
+    }
+}
+

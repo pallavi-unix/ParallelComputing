@@ -1,10 +1,14 @@
 #ifndef _MY_HASHTABLE_H
 #define _MY_HASHTABLE_H
 
-#include "Dictionary.cpp"
+#include <condition_variable>
+#include "Dictionary.hpp"
 #include <functional>
 #include <iostream>
 #include <vector>
+#include <mutex>
+
+using namespace std;
 
 template<class K, class V>
 struct Node {
@@ -29,6 +33,7 @@ protected:
   int count;
   double loadFactor;
   std::vector<Node<K,V>*> table;
+  mutex mu[1000000];
 
   struct hashtable_iter : public dict_iter {
     MyHashtable& mt;
@@ -175,8 +180,54 @@ public:
   }
 
   virtual std::unique_ptr<dict_iter> realEnd() {
-    return std::make_unique<hashtable_iter>(*this, capacity, nullptr);
+    return std::m:wqake_unique<hashtable_iter>(*this, capacity, nullptr);
+  }
+
+  virtual void increase(K &keys)
+  {
+    int cnt = 0;
+    condition_variable_any any;
+
+    size_t size = hash<K>{}(keys) % this-> capacity;
+
+    size = size<0? size+this->capacity : size;
+
+    Node<K,V>* vec = this-> table[size];
+
+    mu[size].lock();
+    any.wait(mu[size],[&](){return !cnt;});
+
+    if(size)
+    {	
+	while (vec != nullptr)
+    	{
+		if(vec -> keys == keys)
+	      	{
+			vec->value = vec->value +1;
+			any.notify_one();
+			mu[size].unlock();
+			return;
+	      	}
+	    	vec = vec->next;
+	}
+    }
+
+    vec = new Node<K,V>(keys,1);
+    vec->next = this->table[size];
+  
+    this->table[size] = vec;
+    this->count++;
+
+    if(((double)this->count)/this->capacity>this->loadFactor)
+    {
+	this->resize(this->capacity * 2);
+    }
+
+    cnt = 1;
+    any.notify_one();
+    mu[size].unlock();
   }
 };
 
 #endif
+
