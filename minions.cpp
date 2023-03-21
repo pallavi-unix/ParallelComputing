@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string>
 #include <unistd.h>
+#include <vector>
 
 using namespace std;
 
@@ -18,11 +19,15 @@ int main (int argc, char** argv) {
   
   int cnt = stoi(argv[1]);
 
+  vector<thread> multiThreads;
+
   for(int i =0; i < cnt; i++)
   {
-    thread t1 (minion, (i+1));
-    t1.join();
+    multiThreads.push_back(thread (minion, (i+1)));
   }  
+
+  for (auto& sep : multiThreads)
+	sep.join();
 
   thread t2 (overlord);
   

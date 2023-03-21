@@ -2,7 +2,7 @@ CXXFLAGS=-std=c++17
 LDLIBS=-lpthread
 
 run: minions
-	./minions 40
+	./minions 5
 
 minions:
 
